@@ -1,0 +1,27 @@
+{
+  "name": "task-yargs",
+  "version": "0.0.1",
+  "description": "Create sub-task oriented common line interfaces with yargs easily",
+  "main": "index.js",
+  "scripts": {
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bguiz/task-yargs"
+  },
+  "keywords": [
+    "yargs",
+    "commandline",
+    "cli",
+    "arguments"
+  ],
+  "author": "bguiz",
+  "license": "GPLv3",
+  "bugs": {
+    "url": "https://github.com/bguiz/task-yargs/issues"
+  },
+  "homepage": "https://github.com/bguiz/task-yargs",
+  "dependencies": {
+    "jasmine-node": "^1.14.5"
+  }
+}
