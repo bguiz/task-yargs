@@ -43,9 +43,6 @@ function taskYargs() {
     if (!isObject(task)) {
       throw new Error('Must specify task object');
     }
-    if (isObject(tasks[name])) {
-      throw new Error('A task has already been registered with the name ' + name);
-    }
     if (!isString(task.description)) {
       throw new Error('Task must specify a description');
     }
@@ -70,11 +67,11 @@ function taskYargs() {
       });
     }
     if (!isArray(task.options)) {
-      throw new Error('Task must specify checks list');
+      throw new Error('Task must specify options list');
     }
     else {
       task.options.forEach(function(option, index) {
-        if (!isObject(option) || !isObject(option.value) || !isString(option.key)) {
+        if (!isObject(option) || !isString(option.key) || !isObject(option.value)) {
           throw new Error('Option #'+index+' is badly formed');
         }
       });
@@ -91,6 +88,9 @@ function taskYargs() {
   function registerTask(name, task) {
     if (hasGotten) {
       throw new Error('Not allowed to register new tasks after first task retrieval');
+    }
+    if (isObject(tasks[name])) {
+      throw new Error('A task has already been registered with the name ' + name);
     }
 
     validateRegisterTask(name, task);
@@ -161,10 +161,23 @@ function taskYargs() {
     var task = getTaskObjectByName(name);
 
     //populate with options and checks from prerequisite tasks
-    var yargsInstance = yargs(processArgv.slice(1));
+    var yargsInstance = yargs(processArgv);
     yargsInstance
       .command(name, task.description)
-      .demand(1);
+      .check(function checkEnsureCommandMatchesTaskName(argv) {
+        if (!isArray(argv._) || argv._.length === 0) {
+          throw new Error('No task defined');
+        }
+        else if (argv._.length !== 1) {
+          throw new Error('More than one task defined');
+        }
+        else if (argv._[0] !== name) {
+          throw new Error('Wrong task invoked: ' + argv._[0] + ' instead of ' + name);
+        }
+        else {
+          return true;
+        }
+      });
     var taskAndPrereqs = [name].concat(task.resolvedPrerequisiteTasks);
     taskAndPrereqs.forEach(function(taskName) {
       var selectedTask = tasks[taskName];
@@ -176,7 +189,6 @@ function taskYargs() {
       });
     });
 
-    yargsInstance.argv;
     return yargsInstance;
   }
 
