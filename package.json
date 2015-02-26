@@ -4,6 +4,7 @@
   "description": "Create sub-task oriented common line interfaces with yargs easily",
   "main": "index.js",
   "scripts": {
+    "test": "node ./node_modules/jasmine-node/bin/jasmine-node test"
   },
   "repository": {
     "type": "git",
@@ -21,7 +22,7 @@
     "url": "https://github.com/bguiz/task-yargs/issues"
   },
   "homepage": "https://github.com/bguiz/task-yargs",
-  "dependencies": {
+  "devDependencies": {
     "jasmine-node": "^1.14.5"
   }
 }
