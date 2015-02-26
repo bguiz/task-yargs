@@ -1,6 +1,6 @@
 {
   "name": "task-yargs",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Create sub-task oriented common line interfaces with yargs easily",
   "main": "index.js",
   "scripts": {
