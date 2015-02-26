@@ -1,7 +1,7 @@
 {
   "name": "task-yargs",
-  "version": "0.0.3",
-  "description": "Create sub-task oriented common line interfaces with yargs easily",
+  "version": "0.0.4",
+  "description": "Create sub-task oriented command line interfaces with yargs easily",
   "main": "index.js",
   "scripts": {
     "test": "node ./node_modules/jasmine-node/bin/jasmine-node test"
@@ -14,7 +14,10 @@
     "yargs",
     "commandline",
     "cli",
-    "arguments"
+    "arguments",
+    "prerequisite",
+    "checks",
+    "options"
   ],
   "author": "bguiz",
   "license": "GPLv3",
