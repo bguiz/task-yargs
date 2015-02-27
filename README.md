@@ -29,23 +29,26 @@ These latter programs are "sub-task oriented".
 [`yargs`](https://github.com/bcoe/yargs) is a great NodeJs module for parsing
 command line arguments.
 It exposes a fluent interface,
-and exposes a non-nonsense means of defining and querying the various flags.
+and exposes a no-nonsense means of defining and querying the various flags.
 
-For programs which expose a single global command line interface, it's perfect.
-One shortcoming of, however,
+For programs which expose a single global command line interface, it is perfect.
+One shortcoming it has, however,
 it that it does not allow you to define and manage multiple sub-tasks.
 This is where `task-yargs` comes in.
 
 ## Prerequisite tasks
 
-One of the main caveats encountered during  building multiple instances of `yargs`
-within the same NodeJs program,
+One of the main caveats encountered during the building of multiple instances
+of `yargs` within the same NodeJs program,
 is that several different sub-tasks will have various flags and options
 in common with each other.
 There needs to be an easy way for one task to say that it would like to
 use the flags and options that have been defined in a another task,
 without having to repeat or redefine them
 This module calls these "prerequisite tasks".
+
+Prerequisite tasks help to keep your `yargs` definitions
+[DRY](http://en.wikipedia.org/wiki/Don%27t_repeat_yourself).
 
 When a sub-task defines one or more of the other sub-tasks as its prerequisite tasks,
 all the `yargs` checks and options defined, recursively,
