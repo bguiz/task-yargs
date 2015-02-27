@@ -95,6 +95,7 @@ function taskYargs() {
 
     validateRegisterTask(name, task);
 
+    task.name = name;
     tasks[name] = task;
   }
 
@@ -163,15 +164,15 @@ function taskYargs() {
     //populate with options and checks from prerequisite tasks
     var yargsInstance = yargs(processArgv);
     yargsInstance
-      .command(name, task.description)
       .check(function checkEnsureCommandMatchesTaskName(argv) {
         if (!isArray(argv._) || argv._.length === 0) {
           throw new Error('No task defined');
         }
-        else if (argv._.length !== 1) {
+        else if (isArray(argv._) && argv._.length !== 1) {
+          console.log('argv._', argv._);
           throw new Error('More than one task defined');
         }
-        else if (argv._[0] !== name) {
+        else if (isArray(argv._) && argv._[0] !== name) {
           throw new Error('Wrong task invoked: ' + argv._[0] + ' instead of ' + name);
         }
         else {
@@ -192,9 +193,27 @@ function taskYargs() {
     return yargsInstance;
   }
 
+  function getCurrentTaskName(processArgv) {
+    processArgv = processArgv || process.argv;
+    var argv = yargs(processArgv).argv;
+    if (argv && isArray(argv._) && argv._.length > 2) {
+      return argv._[2];
+    }
+  }
+
+  function getCurrentTask(processArgv) {
+    processArgv = processArgv || process.argv;
+    var taskName = getCurrentTaskName(processArgv);
+    if (taskName) {
+      return getTaskByName(taskName, processArgv.slice(2));
+    }
+  }
+
   return {
     register: registerTask,
     get: getTaskByName,
+    getCurrent: getCurrentTask,
+    getCurrentName: getCurrentTaskName,
     getDefinition: getTaskObjectByName,
   };
 }

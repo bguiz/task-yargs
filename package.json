@@ -1,6 +1,6 @@
 {
   "name": "task-yargs",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Create sub-task oriented command line interfaces with yargs easily",
   "main": "index.js",
   "scripts": {
@@ -27,5 +27,8 @@
   "homepage": "https://github.com/bguiz/task-yargs",
   "devDependencies": {
     "jasmine-node": "^1.14.5"
+  },
+  "dependencies": {
+    "yargs": "^2"
   }
 }
