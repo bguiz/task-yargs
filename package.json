@@ -27,5 +27,8 @@
   "homepage": "https://github.com/bguiz/task-yargs",
   "devDependencies": {
     "jasmine-node": "^1.14.5"
+  },
+  "dependencies": {
+    "yargs": "^2"
   }
 }
