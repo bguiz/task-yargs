@@ -2,21 +2,7 @@
 
 var yargs = require('yargs');
 
-function isString(thing) {
-  return (typeof thing === 'string');
-}
-
-function isFunction(thing) {
-  return (typeof thing === 'function');
-}
-
-function isObject(thing) {
-  return (Object.prototype.toString.call(thing) === '[object Object]');
-}
-
-function isArray(thing) {
-  return (Object.prototype.toString.call(thing) === '[object Array]');
-}
+var validate = require('./validate');
 
 function taskYargs() {
   /**
@@ -32,53 +18,6 @@ function taskYargs() {
   var hasGotten = false;
 
   /**
-   * Throws various `Error`s should a task not be allowed to register
-   * @param {string} name The name of the task - must be unique
-   * @param {object} task The definition for the task object
-   */
-  function validateRegisterTask(name, task) {
-    if (!isString(name) || name.length < 1) {
-      throw new Error('Must specify a task name');
-    }
-    if (!isObject(task)) {
-      throw new Error('Must specify task object');
-    }
-    if (!isString(task.description)) {
-      throw new Error('Task must specify a description');
-    }
-    if (!isArray(task.prerequisiteTasks)) {
-      throw new Error('Task must specify prerequisite tasks list');
-    }
-    else {
-      task.prerequisiteTasks.forEach(function(prerequisiteTask, index) {
-        if (!isString(prerequisiteTask)) {
-          throw new Error('Prerequisite task #'+index+' is not a string');
-        }
-      });
-    }
-    if (!isArray(task.checks)) {
-      throw new Error('Task must specify checks list');
-    }
-    else {
-      task.checks.forEach(function(check, index) {
-        if (!isFunction(check)) {
-          throw new Error('Check #'+index+' is badly formed');
-        }
-      });
-    }
-    if (!isArray(task.options)) {
-      throw new Error('Task must specify options list');
-    }
-    else {
-      task.options.forEach(function(option, index) {
-        if (!isObject(option) || !isString(option.key) || !isObject(option.value)) {
-          throw new Error('Option #'+index+' is badly formed');
-        }
-      });
-    }
-  }
-
-  /**
    * Register a new task
    * Note that call calls to `registerTask` must precede any calls to `getTaskObjectByName`,
    * lest an `Error` be thrown.
@@ -89,11 +28,11 @@ function taskYargs() {
     if (hasGotten) {
       throw new Error('Not allowed to register new tasks after first task retrieval');
     }
-    if (isObject(tasks[name])) {
+    if (validate.isObject(tasks[name])) {
       throw new Error('A task has already been registered with the name ' + name);
     }
 
-    validateRegisterTask(name, task);
+    validate.registerTask(name, task);
 
     task.name = name;
     tasks[name] = task;
@@ -111,7 +50,7 @@ function taskYargs() {
       if (!task) {
         throw new Error('No task registered with name ' + taskName);
       }
-      if (isArray(task.prerequisiteTasks)) {
+      if (validate.isArray(task.prerequisiteTasks)) {
         task.prerequisiteTasks.forEach(function(prereqTaskName) {
           list.push(prereqTaskName);
           addPrereqTasksToList(prereqTaskName); //recursion
@@ -142,7 +81,7 @@ function taskYargs() {
     }
 
     //use cached copy of resolved prerequisite tasks if present
-    if (!isArray(task.resolvedPrerequisiteTasks)) {
+    if (!validate.isArray(task.resolvedPrerequisiteTasks)) {
       task.resolvedPrerequisiteTasks = getAllPrereqTasks(name);
     }
 
@@ -164,21 +103,7 @@ function taskYargs() {
     //populate with options and checks from prerequisite tasks
     var yargsInstance = yargs(processArgv);
     yargsInstance
-      .check(function checkEnsureCommandMatchesTaskName(argv) {
-        if (!isArray(argv._) || argv._.length === 0) {
-          throw new Error('No task defined');
-        }
-        else if (isArray(argv._) && argv._.length !== 1) {
-          console.log('argv._', argv._);
-          throw new Error('More than one task defined');
-        }
-        else if (isArray(argv._) && argv._[0] !== name) {
-          throw new Error('Wrong task invoked: ' + argv._[0] + ' instead of ' + name);
-        }
-        else {
-          return true;
-        }
-      });
+      .check(validate.getCheck.ensureCommandMatchesTaskName(name));
     var taskAndPrereqs = [name].concat(task.resolvedPrerequisiteTasks);
     taskAndPrereqs.forEach(function(taskName) {
       var selectedTask = tasks[taskName];
@@ -196,8 +121,10 @@ function taskYargs() {
   function getCurrentTaskName(processArgv) {
     processArgv = processArgv || process.argv;
     var argv = yargs(processArgv).argv;
-    if (argv && isArray(argv._) && argv._.length > 2) {
-      return argv._[2];
+    if (argv && validate.isArray(argv._) && argv._.length > 2) {
+      if (validate.isObject(tasks[argv._[2]])) {
+        return argv._[2];
+      }
     }
   }
 
