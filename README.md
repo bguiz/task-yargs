@@ -4,6 +4,8 @@ Create sub-task oriented common line interfaces with yargs easily.
 
 [![NPM](https://nodei.co/npm/task-yargs.png)](https://github.com/bguiz/task-yargs/)
 
+[![Build Status](https://travis-ci.org/bguiz/task-yargs.svg?branch=master)](https://travis-ci.org/bguiz/task-yargs)
+
 ## What is "sub-task oriented"?
 
 Some programs have a command line interface which exposes a single global interface.
