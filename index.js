@@ -102,6 +102,7 @@ function taskYargs() {
 
     //populate with options and checks from prerequisite tasks
     var yargsInstance = yargs(processArgv);
+    yargsInstance.usage(task.description);
     yargsInstance
       .check(validate.getCheck.ensureCommandMatchesTaskName(name));
     var taskAndPrereqs = [name].concat(task.resolvedPrerequisiteTasks);
