@@ -57,6 +57,105 @@ all the `yargs` checks and options defined, recursively,
 by its prerequisite tasks are defined upon itself automatically.
 This allows one to adhere to DRY principles in defining each of the sub-tasks.
 
+## Usage
+
+In your project directory: `npm install task-yargs --save`
+
+### Entry Point
+
+In the entry point for your project - usually `index.js` or `bin/cli.js`,
+import `task-yargs`:
+
+```javascript
+var taskYargs = require('task-yargs');
+```
+
+... and you are good to go with the `task-yargs` API.
+
+To do something useful, you might use it like so, also in the same entry point file:
+
+```javascript
+var cliArgs;
+var taskName = taskYargs.getCurrentName();
+if (taskName) {
+  var yargsInstance = taskYargs.getCurrent();
+  cliArgs = yargsInstance.argv;
+  // assuming that all your subtasks expose a `--help` flag
+  if (cliArgs.help) {
+    yargsInstance.showHelp();
+  }
+  else {
+    // Run the subtask by the name of `taskName`
+    // e.g. When using gulp, use `run-sequence` to invoke the appropriate gulp task
+    require('run-sequence')(taskName);
+  }
+}
+else {
+  // Display an error message as no recognised subtask was specified
+}
+```
+
+### Querying the CLI Parameters
+
+Of course, once you invoke the function for the sub task,
+you will need to respond to it,
+which involves appropriately identifying the command line parameters.
+
+```javascript
+function fooTask() {
+  // `taskYargs.getCurrent()` return a regular `yargs` instance
+  // so simply use it as you would any other `yargs` instance
+  var yargsInstance = taskYargs.getCurrent();
+  yargsInstance.strict().wrap(100);
+  var argv = yargsInstance.argv;
+
+  // Now do stuff based on the `argv` object
+}
+```
+
+### Register
+
+The above will not work unless `task-yargs` has been registered with a task.
+To do so, pass the **same instance** as the one used in the entry point file,
+to wherever you wish to register it.
+This could be anywhere, but it makes the most sense to place it in either:
+
+- The entry point file
+- The file containing the function responding to that subtask
+
+```javascript
+taskYargs.register('foo', {
+  description: '"foo" does blah blah',
+  prerequisiteTasks: ['bar'], // be sure to register a `bar` task elsewhere
+  options: [
+    // The `key` and `value` are passed to `yargs.option(key, value)`
+    {
+      key: 'baz',
+      value: {
+        describe: 'Set value of baz',
+        alias: ['b'],
+        string: true,
+        default: false
+      }
+    }
+  ],
+  checks: [
+    // A check function to pass to `yargs.check()`
+    function checkFoo(argv) {
+      if (argv.help) {
+        return true;
+      }
+      else if (argv.baz === 'illegalValue') {
+        throw new Error('Value of baz option is illegal');
+      }
+      else {
+        return true;
+      }
+    }
+  ]
+});
+```
+
 ## Author
 
 Maintained by Brendan Graetz
