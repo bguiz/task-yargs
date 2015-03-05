@@ -41,6 +41,12 @@ function validateRegisterTask(name, task) {
       }
     });
   }
+  if (!!task.onRun && !isFunction(task.onRun)) {
+    throw new Error('Task onRun must be a function, if present');
+  }
+  if (!!task.onInit && !isFunction(task.onInit)) {
+    throw new Error('Task onInit must be a function, if present');
+  }
   if (!isArray(task.checks)) {
     throw new Error('Task must specify checks list');
   }

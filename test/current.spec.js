@@ -7,21 +7,21 @@ var helper = require('./helper');
 describe('[current]', function() {
   describe('[name]', function() {
     it('Should identify the current task name', function(done) {
-      var taskYargsInstance = taskYargs();
-      taskYargsInstance.register('blank', {
+      var tyInstance = taskYargs();
+      tyInstance.register('blank', {
         description: 'A blank task',
         prerequisiteTasks: [],
         checks: [],
         options: [],
       });
       var taskName;
-      taskName = taskYargsInstance
+      taskName = tyInstance
         .getCurrentName(['node', 'my-process', 'blank']);
       expect(taskName).toEqual('blank');
-      taskName = taskYargsInstance
+      taskName = tyInstance
         .getCurrentName(['node', 'my-process', 'blank', '--foo', 'bar']);
       expect(taskName).toEqual('blank');
-      taskName = taskYargsInstance
+      taskName = tyInstance
         .getCurrentName(['node', 'my-process', 'wrongTask', '--foo', 'bar']);
       expect(taskName).toBeUndefined();
       done();
@@ -29,8 +29,8 @@ describe('[current]', function() {
   });
   describe('[task]', function() {
     it('Should retrieve the current task', function(done) {
-      var taskYargsInstance = taskYargs();
-      taskYargsInstance.register('blank', {
+      var tyInstance = taskYargs();
+      tyInstance.register('blank', {
         description: 'A blank task',
         prerequisiteTasks: [],
         checks: [],
@@ -43,15 +43,15 @@ describe('[current]', function() {
         }],
       });
       var task, argv;
-      task = taskYargsInstance
+      task = tyInstance
         .getCurrent(['node', 'my-process', 'blank']);
       argv = task.argv;
       expect(argv.foo).toEqual('meh');
-      task = taskYargsInstance
+      task = tyInstance
         .getCurrent(['node', 'my-process', 'blank', '--foo', 'bar']);
       argv = task.argv;
       expect(argv.foo).toEqual('bar');
-      task = taskYargsInstance
+      task = tyInstance
         .getCurrent(['node', 'my-process', 'wrongTask', '--foo', 'bar']);
       expect(task).toBeUndefined();
       done();

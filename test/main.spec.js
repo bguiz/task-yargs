@@ -6,34 +6,89 @@ var taskYargs = require('../index');
 describe('[register without prerequisites]', function() {
   describe('[basic]', function() {
     it('Should register simple', function(done) {
-      var taskYargsInstance = taskYargs();
-      taskYargsInstance.register('blank', {
+      var tyInstance = taskYargs();
+      tyInstance.register('blank', {
         description: 'A blank task',
         prerequisiteTasks: [],
         checks: [],
         options: [],
       });
-      var yargsInstance = taskYargsInstance.get('blank', ['blank']);
+      var yargsInstance = tyInstance.get('blank', ['blank']);
+      var argv = yargsInstance.argv;
+      expect(argv._).toEqual(['blank']);
+      done();
+    });
+
+    it('Should register without name as parameter but in defintion object instead', function(done) {
+      var tyInstance = taskYargs();
+      expect(function() {
+        tyInstance.register({
+          description: 'A blank task without a name and shouldn\'t be allowed to register',
+          prerequisiteTasks: [],
+          checks: [],
+          options: [],
+        });
+      }).toThrow('Must specify a task name');
+
+      tyInstance.register({
+        name: 'blank',
+        description: 'A blank task',
+        prerequisiteTasks: [],
+        checks: [],
+        options: [],
+      });
+      var yargsInstance = tyInstance.get('blank', ['blank']);
+      var argv = yargsInstance.argv;
+      expect(argv._).toEqual(['blank']);
+
+      done();
+    });
+
+    it('Should register with optional onRun function', function(done) {
+      var tyInstance = taskYargs();
+      tyInstance.register('blank', {
+        description: 'A blank task with an onRun function',
+        prerequisiteTasks: [],
+        checks: [],
+        options: [],
+        onRun: function() { /* do nothing */ },
+      });
+      var yargsInstance = tyInstance.get('blank', ['blank']);
+      var argv = yargsInstance.argv;
+      expect(argv._).toEqual(['blank']);
+      done();
+    });
+
+    it('Should register with optional onInit function', function(done) {
+      var tyInstance = taskYargs();
+      tyInstance.register('blank', {
+        description: 'A blank task with an onInit function',
+        prerequisiteTasks: [],
+        checks: [],
+        options: [],
+        onInit: function() { /* do nothing */ },
+      });
+      var yargsInstance = tyInstance.get('blank', ['blank']);
       var argv = yargsInstance.argv;
       expect(argv._).toEqual(['blank']);
       done();
     });
 
     it('Should NOT allow any tasks to be registered after first task has been retrieved', function(done) {
-      var taskYargsInstance = taskYargs();
+      var tyInstance = taskYargs();
 
-      taskYargsInstance.register('blank', {
+      tyInstance.register('blank', {
         description: 'A blank task',
         prerequisiteTasks: [],
         checks: [],
         options: [],
       });
-      var yargsInstance = taskYargsInstance.get('blank', ['blank']);
+      var yargsInstance = tyInstance.get('blank', ['blank']);
       var exception;
       var yargsInstance;
 
       expect(function() {
-        taskYargsInstance.register('blank2', {
+        tyInstance.register('blank2', {
           description: 'A blank task',
           prerequisiteTasks: [],
           checks: [],
@@ -44,10 +99,10 @@ describe('[register without prerequisites]', function() {
     });
 
     it('Should not allow two tasks with the same name to be registered', function(done) {
-      var taskYargsInstance = taskYargs();
+      var tyInstance = taskYargs();
 
       expect(function() {
-          taskYargsInstance.register('blank', {
+          tyInstance.register('blank', {
           description: 'A blank task',
           prerequisiteTasks: [],
           checks: [],
@@ -56,7 +111,7 @@ describe('[register without prerequisites]', function() {
       }).not.toThrow();
 
       expect(function() {
-        taskYargsInstance.register('blank', {
+        tyInstance.register('blank', {
           description: 'A task attempting to overwrite an existing task',
           prerequisiteTasks: [],
           checks: [],
@@ -69,26 +124,26 @@ describe('[register without prerequisites]', function() {
   });
 
   describe('[validations]', function() {
-    var taskYargsInstance = taskYargs();
+    var tyInstance = taskYargs();
     it('Should reject registrations without params', function(done) {
       expect(function() {
-        taskYargsInstance.register(undefined, {});
+        tyInstance.register(undefined, {});
       }).toThrow('Must specify a task name');
       expect(function() {
-        taskYargsInstance.register('', {});
+        tyInstance.register('', {});
       }).toThrow('Must specify a task name');
       expect(function() {
-        taskYargsInstance.register('blank', undefined);
+        tyInstance.register('blank', undefined);
       }).toThrow('Must specify task object');
       expect(function() {
-        taskYargsInstance.register('blank', 'notAnObject');
+        tyInstance.register('blank', 'notAnObject');
       }).toThrow('Must specify task object');
       done();
     });
 
     it('Should reject badly formed task details', function(done) {
       expect(function() {
-        taskYargsInstance.register('noDescrioption', {
+        tyInstance.register('noDescrioption', {
           description: undefined,
           prerequisiteTasks: [],
           checks: [],
@@ -97,7 +152,7 @@ describe('[register without prerequisites]', function() {
       }).toThrow('Task must specify a description');
       done();
       expect(function() {
-        taskYargsInstance.register('noPrerequisites', {
+        tyInstance.register('noPrerequisites', {
           description: 'A task without prerequisites',
           prerequisiteTasks: undefined,
           checks: [],
@@ -106,7 +161,7 @@ describe('[register without prerequisites]', function() {
       }).toThrow('Task must specify prerequisite tasks list');
       done();
       expect(function() {
-        taskYargsInstance.register('malformedPrerequisites', {
+        tyInstance.register('malformedPrerequisites', {
           description: 'A task with malformed prerequisites',
           prerequisiteTasks: ['ok', 123],
           checks: [],
@@ -115,7 +170,7 @@ describe('[register without prerequisites]', function() {
       }).toThrow('Prerequisite task #1 is not a string');
       done();
       expect(function() {
-        taskYargsInstance.register('noChecks', {
+        tyInstance.register('noChecks', {
           description: 'A task without checks',
           prerequisiteTasks: [],
           checks: undefined,
@@ -124,7 +179,7 @@ describe('[register without prerequisites]', function() {
       }).toThrow('Task must specify checks list');
       done();
       expect(function() {
-        taskYargsInstance.register('malformedChecks', {
+        tyInstance.register('malformedChecks', {
           description: 'A task with malformed checks',
           prerequisiteTasks: [],
           checks: [function() {}, 123],
@@ -133,7 +188,7 @@ describe('[register without prerequisites]', function() {
       }).toThrow('Check #1 is badly formed');
       done();
       expect(function() {
-        taskYargsInstance.register('noOptions', {
+        tyInstance.register('noOptions', {
           description: 'A task attempting to overwrite an existing task',
           prerequisiteTasks: [],
           checks: [],
@@ -142,20 +197,38 @@ describe('[register without prerequisites]', function() {
       }).toThrow('Task must specify options list');
       done();
       expect(function() {
-        taskYargsInstance.register('malformedOptions', {
+        tyInstance.register('malformedOptions', {
           description: 'A task attempting to overwrite an existing task',
           prerequisiteTasks: [],
           checks: [],
           options: [{ key: 'flag', value: {} }, 123],
         });
       }).toThrow('Option #1 is badly formed');
+      expect(function() {
+        tyInstance.register('onRunWrongType', {
+          description: 'A task attempting to assign an onRun that is not a function',
+          prerequisiteTasks: [],
+          checks: [],
+          options: [],
+          onRun: {},
+        });
+      }).toThrow('Task onRun must be a function, if present');
+      expect(function() {
+        tyInstance.register('onInitWrongType', {
+          description: 'A task attempting to assign an onInit that is not a function',
+          prerequisiteTasks: [],
+          checks: [],
+          options: [],
+          onInit: {},
+        });
+      }).toThrow('Task onInit must be a function, if present');
       done();
     });
   });
 
   describe('[subcommand]', function() {
-    var taskYargsInstance = taskYargs();
-    taskYargsInstance.register('blank', {
+    var tyInstance = taskYargs();
+    tyInstance.register('blank', {
       description: 'A blank task',
       prerequisiteTasks: [],
       checks: [],
@@ -166,13 +239,13 @@ describe('[register without prerequisites]', function() {
 
     it('Should ensure exactly one', function(done) {
       expect(function() {
-        yargsInstance = taskYargsInstance.get('blank', []);
+        yargsInstance = tyInstance.get('blank', []);
         yargsInstance.exitProcess(false);
         yargsInstance.argv;
       }).toThrow('Error: No task defined');
 
       expect(function() {
-        yargsInstance = taskYargsInstance.get('blank', ['blank', 'differentTask']);
+        yargsInstance = tyInstance.get('blank', ['blank', 'differentTask']);
         yargsInstance.exitProcess(false);
         yargsInstance.argv;
       }).toThrow('Error: More than one task defined');
@@ -182,13 +255,13 @@ describe('[register without prerequisites]', function() {
 
     it('Should ensure matches', function(done) {
       expect(function() {
-        yargsInstance = taskYargsInstance.get('blank', ['differentTask']);
+        yargsInstance = tyInstance.get('blank', ['differentTask']);
         yargsInstance.exitProcess(false);
         yargsInstance.argv;
       }).toThrow('Error: Wrong task invoked: differentTask instead of blank');
 
       expect(function() {
-        yargsInstance = taskYargsInstance.get('blank', ['blank']);
+        yargsInstance = tyInstance.get('blank', ['blank']);
         yargsInstance.exitProcess(false);
         yargsInstance.argv;
       }).not.toThrow();
