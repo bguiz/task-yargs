@@ -7,84 +7,84 @@ var helper = require('./helper');
 describe('[register with prerequisite]', function() {
   describe('[basic]', function() {
     it('Should resolve single', function(done) {
-      var taskYargsInstance = taskYargs();
-      taskYargsInstance.register('child', {
+      var tyInstance = taskYargs();
+      tyInstance.register('child', {
         description: 'A blank task',
         prerequisiteTasks: [],
         checks: [],
         options: [],
       });
-      taskYargsInstance.register('father', {
+      tyInstance.register('father', {
         description: 'A blank task',
         prerequisiteTasks: ['child'],
         checks: [],
         options: [],
       });
-      var fatherYargsDefinition = taskYargsInstance.getDefinition('father', ['father']);
+      var fatherYargsDefinition = tyInstance.getDefinition('father', ['father']);
       expect(fatherYargsDefinition.resolvedPrerequisiteTasks).toEqual(['child']);
       done();
     });
     it('Should resolve multiple levels', function(done) {
-      var taskYargsInstance = taskYargs();
-      taskYargsInstance.register('child', {
+      var tyInstance = taskYargs();
+      tyInstance.register('child', {
         description: 'A blank task',
         prerequisiteTasks: [],
         checks: [],
         options: [],
       });
-      taskYargsInstance.register('father', {
+      tyInstance.register('father', {
         description: 'A blank task',
         prerequisiteTasks: ['child'],
         checks: [],
         options: [],
       });
-      taskYargsInstance.register('grandfather', {
+      tyInstance.register('grandfather', {
         description: 'A blank task',
         prerequisiteTasks: ['father'],
         checks: [],
         options: [],
       });
-      var grandFatherYargsDefinition = taskYargsInstance.getDefinition('grandfather', ['grandfather']);
+      var grandFatherYargsDefinition = tyInstance.getDefinition('grandfather', ['grandfather']);
       expect(grandFatherYargsDefinition.resolvedPrerequisiteTasks).toEqual(['father', 'child']);
-      var fatherYargsDefinition = taskYargsInstance.getDefinition('father', ['father']);
+      var fatherYargsDefinition = tyInstance.getDefinition('father', ['father']);
       expect(fatherYargsDefinition.resolvedPrerequisiteTasks).toEqual(['child']);
       done();
     });
     it('Should resolve multiple siblings', function(done) {
-      var taskYargsInstance = taskYargs();
-      taskYargsInstance.register('child', {
+      var tyInstance = taskYargs();
+      tyInstance.register('child', {
         description: 'A blank task',
         prerequisiteTasks: [],
         checks: [],
         options: [],
       });
-      taskYargsInstance.register('sister', {
+      tyInstance.register('sister', {
         description: 'A blank task',
         prerequisiteTasks: [],
         checks: [],
         options: [],
       });
-      taskYargsInstance.register('father', {
+      tyInstance.register('father', {
         description: 'A blank task',
         prerequisiteTasks: ['child', 'sister'],
         checks: [],
         options: [],
       });
-      taskYargsInstance.register('mother', {
+      tyInstance.register('mother', {
         description: 'A blank task',
         prerequisiteTasks: ['child', 'sister'],
         checks: [],
         options: [],
       });
-      taskYargsInstance.register('grandfather', {
+      tyInstance.register('grandfather', {
         description: 'A blank task',
         prerequisiteTasks: ['father', 'mother'],
         checks: [],
         options: [],
       });
-      var grandFatherYargsDefinition = taskYargsInstance.getDefinition('grandfather', ['grandfather']);
+      var grandFatherYargsDefinition = tyInstance.getDefinition('grandfather', ['grandfather']);
       expect(grandFatherYargsDefinition.resolvedPrerequisiteTasks).toEqual(['father', 'child', 'sister', 'mother']);
-      var fatherYargsDefinition = taskYargsInstance.getDefinition('father', ['father']);
+      var fatherYargsDefinition = tyInstance.getDefinition('father', ['father']);
       expect(fatherYargsDefinition.resolvedPrerequisiteTasks).toEqual(['child', 'sister']);
       done();
     });
@@ -92,34 +92,34 @@ describe('[register with prerequisite]', function() {
 
   describe('[checks and options]', function() {
     it('Should register basic', function() {
-      var taskYargsInstance = taskYargs();
-      taskYargsInstance.register('blank', {
+      var tyInstance = taskYargs();
+      tyInstance.register('blank', {
         description: 'A blank task',
         prerequisiteTasks: [],
         checks: [helper.checkMustHaveFooUnlessHelp],
         options: [helper.optionFoo],
       });
-      var fooYargsInstance = taskYargsInstance.get('blank', ['blank', '--foo', 'bar']);
+      var fooYargsInstance = tyInstance.get('blank', ['blank', '--foo', 'bar']);
       expect(fooYargsInstance.argv.foo).toEqual('bar');
       //test alias too
       expect(fooYargsInstance.argv.f).toEqual('bar');
     });
     it('Should register with default', function() {
-      var taskYargsInstance = taskYargs();
-      taskYargsInstance.register('blank', {
+      var tyInstance = taskYargs();
+      tyInstance.register('blank', {
         description: 'A blank task',
         prerequisiteTasks: [],
         checks: [helper.checkMustHaveFooUnlessHelp],
         options: [helper.optionFoo],
       });
-      var fooYargsInstance = taskYargsInstance.get('blank', ['blank']);
+      var fooYargsInstance = tyInstance.get('blank', ['blank']);
       expect(fooYargsInstance.argv.foo).toEqual('meh');
       //test alias too
       expect(fooYargsInstance.argv.f).toEqual('meh');
     });
     it('Should register without default', function(done) {
-      var taskYargsInstance = taskYargs();
-      taskYargsInstance.register('blank', {
+      var tyInstance = taskYargs();
+      tyInstance.register('blank', {
         description: 'A blank task',
         prerequisiteTasks: [],
         checks: [helper.checkMustHaveFooUnlessHelp, helper.checkMustHaveJojoUnlessHelp],
@@ -131,108 +131,108 @@ describe('[register with prerequisite]', function() {
 
   describe('[inherit checks and options]', function() {
     it('Should inherit from single', function() {
-      var taskYargsInstance = taskYargs();
-      var taskYargsInstance = taskYargs();
-      taskYargsInstance.register('child', {
+      var tyInstance = taskYargs();
+      var tyInstance = taskYargs();
+      tyInstance.register('child', {
         description: 'A blank task',
         prerequisiteTasks: [],
         checks: [helper.checkMustHaveFooUnlessHelp],
         options: [helper.optionFoo],
       });
-      taskYargsInstance.register('father', {
+      tyInstance.register('father', {
         description: 'A blank task',
         prerequisiteTasks: ['child'],
         checks: [],
         options: [],
       });
-      var fatherYargsInstance = taskYargsInstance.get('father', ['father', '--foo', 'bar']);
+      var fatherYargsInstance = tyInstance.get('father', ['father', '--foo', 'bar']);
       expect(fatherYargsInstance.argv.foo).toEqual('bar');
       //test alias too
       expect(fatherYargsInstance.argv.f).toEqual('bar');
     });
     it('Should inherit from single with default', function() {
-      var taskYargsInstance = taskYargs();
-      var taskYargsInstance = taskYargs();
-      taskYargsInstance.register('child', {
+      var tyInstance = taskYargs();
+      var tyInstance = taskYargs();
+      tyInstance.register('child', {
         description: 'A blank task',
         prerequisiteTasks: [],
         checks: [helper.checkMustHaveFooUnlessHelp],
         options: [helper.optionFoo],
       });
-      taskYargsInstance.register('father', {
+      tyInstance.register('father', {
         description: 'A blank task',
         prerequisiteTasks: ['child'],
         checks: [],
         options: [],
       });
-      var fatherYargsInstance = taskYargsInstance.get('father', ['father']);
+      var fatherYargsInstance = tyInstance.get('father', ['father']);
       expect(fatherYargsInstance.argv.foo).toEqual('meh');
       //test alias too
       expect(fatherYargsInstance.argv.f).toEqual('meh');
     });
     it('Should inherit from multiple levels', function() {
-      var taskYargsInstance = taskYargs();
-      var taskYargsInstance = taskYargs();
-      taskYargsInstance.register('child', {
+      var tyInstance = taskYargs();
+      var tyInstance = taskYargs();
+      tyInstance.register('child', {
         description: 'A blank task',
         prerequisiteTasks: [],
         checks: [helper.checkMustHaveFooUnlessHelp],
         options: [helper.optionFoo],
       });
-      taskYargsInstance.register('father', {
+      tyInstance.register('father', {
         description: 'A blank task',
         prerequisiteTasks: ['child'],
         checks: [],
         options: [],
       });
-      taskYargsInstance.register('grandfather', {
+      tyInstance.register('grandfather', {
         description: 'A blank task',
         prerequisiteTasks: ['father'],
         checks: [],
         options: [],
       });
-      var grandFatherYargsInstance = taskYargsInstance.get('grandfather', ['grandfather']);
+      var grandFatherYargsInstance = tyInstance.get('grandfather', ['grandfather']);
       expect(grandFatherYargsInstance.argv.foo).toEqual('meh');
       //test alias too
       expect(grandFatherYargsInstance.argv.f).toEqual('meh');
     });
     it('Should inherit from multiple siblings', function() {
-      var taskYargsInstance = taskYargs();
-      taskYargsInstance.register('child', {
+      var tyInstance = taskYargs();
+      tyInstance.register('child', {
         description: 'A blank task',
         prerequisiteTasks: [],
         checks: [helper.checkMustHaveFooUnlessHelp],
         options: [helper.optionFoo],
       });
-      taskYargsInstance.register('sister', {
+      tyInstance.register('sister', {
         description: 'A blank task',
         prerequisiteTasks: [],
         checks: [],
         options: [],
       });
-      taskYargsInstance.register('father', {
+      tyInstance.register('father', {
         description: 'A blank task',
         prerequisiteTasks: ['child', 'sister'],
         checks: [],
         options: [],
       });
-      taskYargsInstance.register('mother', {
+      tyInstance.register('mother', {
         description: 'A blank task',
         prerequisiteTasks: ['child', 'sister'],
         checks: [],
         options: [],
       });
-      taskYargsInstance.register('grandfather', {
+      tyInstance.register('grandfather', {
         description: 'A blank task',
         prerequisiteTasks: ['father', 'mother'],
         checks: [],
         options: [],
       });
-      var grandFatherYargsInstance = taskYargsInstance.get('grandfather', ['grandfather']);
+      var grandFatherYargsInstance = tyInstance.get('grandfather', ['grandfather']);
       expect(grandFatherYargsInstance.argv.foo).toEqual('meh');
       //test alias too
       expect(grandFatherYargsInstance.argv.f).toEqual('meh');
-      var fatherYargsInstance = taskYargsInstance.get('father', ['father', '-f', 'bar']);
+      var fatherYargsInstance = tyInstance.get('father', ['father', '-f', 'bar']);
       expect(fatherYargsInstance.argv.foo).toEqual('bar');
       //test alias too
       expect(fatherYargsInstance.argv.f).toEqual('bar');

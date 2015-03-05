@@ -25,6 +25,10 @@ function taskYargs() {
    * @param {object} task The definition for the task object
    */
   function registerTask(name, task) {
+    if (validate.isObject(name) && name.name) {
+      task = name;
+      name = task.name;
+    }
     if (hasGotten) {
       throw new Error('Not allowed to register new tasks after first task retrieval');
     }
@@ -123,8 +127,9 @@ function taskYargs() {
     processArgv = processArgv || process.argv;
     var argv = yargs(processArgv).argv;
     if (argv && validate.isArray(argv._) && argv._.length > 2) {
-      if (validate.isObject(tasks[argv._[2]])) {
-        return argv._[2];
+      var taskName = argv._[2];
+      if (validate.isObject(tasks[taskName])) {
+        return taskName;
       }
     }
   }
@@ -140,9 +145,9 @@ function taskYargs() {
   return {
     register: registerTask,
     get: getTaskByName,
+    getDefinition: getTaskObjectByName,
     getCurrent: getCurrentTask,
     getCurrentName: getCurrentTaskName,
-    getDefinition: getTaskObjectByName,
   };
 }
 
