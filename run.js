@@ -5,7 +5,6 @@ var taskYargs = require('./index');
 function taskYargsRun() {
   var tyInstance = taskYargs();
 
-
   function initialise(taskName) {
     // Call onInit of all prerequisite tasks which them
     var taskDefinition = tyInstance.getDefinition(taskName);
