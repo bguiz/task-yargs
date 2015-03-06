@@ -5,7 +5,7 @@ var taskYargs = require('./index');
 function taskYargsRun() {
   var tyInstance = taskYargs();
 
-  function initialise(taskName) {
+  function initialise(taskName, yargsInstance) {
     // Call onInit of all prerequisite tasks which them
     var taskDefinition = tyInstance.getDefinition(taskName);
     var taskAndPrereqs = [].concat(taskDefinition.resolvedPrerequisiteTasks).concat(taskName);
@@ -14,7 +14,7 @@ function taskYargsRun() {
     }).filter(function(onInit) {
       return (typeof onInit === 'function');
     }).forEach(function(onInit) {
-        onInit();
+        onInit(yargsInstance);
     });
   }
 
@@ -30,7 +30,7 @@ function taskYargsRun() {
 
     if (typeof onRun === 'function') {
       var yargsInstance = tyInstance.get(taskName, processArgv.slice(2));
-      initialise(taskName);
+      initialise(taskName, yargsInstance);
       onRun(yargsInstance);
     }
     else {
