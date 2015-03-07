@@ -1,5 +1,6 @@
 'use strict';
 
+var helper = require('./helper');
 var taskYargsRun = require('../run');
 
 describe('[run]', function() {
@@ -38,19 +39,28 @@ describe('[run]', function() {
       tyRunInstance.taskYargs.register('blank', {
         description: 'A blank task with an onInit function',
         prerequisiteTasks: [],
-        checks: [],
-        options: [],
-        onInit: function() {
+        checks: [helper.checkMustHaveFooUnlessHelp],
+        options: [helper.optionFoo],
+        onInit: function(yargsInstance) {
           onInitHasRun = true;
+          expect(function() {
+            var cliArgs = yargsInstance.argv;
+            expect(cliArgs.foo).toEqual('bar');
+          }).not.toThrow();
         },
-        onRun: function() {
+        onRun: function(yargsInstance) {
           onRunHasRun = true;
+          expect(function() {
+            var cliArgs = yargsInstance.argv;
+            expect(cliArgs.foo).toEqual('bar');
+          }).not.toThrow();
         },
       });
 
       onInitHasRun = false;
       onRunHasRun = false;
-      tyRunInstance.byName('blank');
+      tyRunInstance.byName('blank', undefined,
+        ['node', 'my-process', 'blank', '--foo', 'bar']);
       expect(onInitHasRun).toEqual(true);
       expect(onRunHasRun).toEqual(true);
       done();
@@ -63,32 +73,46 @@ describe('[run]', function() {
       tyRunInstance.taskYargs.register('child', {
         description: 'A child task with an onInit function',
         prerequisiteTasks: [],
-        checks: [],
-        options: [],
-        onInit: function() {
+        checks: [helper.checkMustHaveJojoUnlessHelp],
+        options: [helper.optionJojo],
+        onInit: function(yargsInstance) {
           onInitChildHasRun = true;
+          expect(function() {
+            var cliArgs = yargsInstance.argv;
+            expect(cliArgs.jojo).toEqual('momo');
+          }).not.toThrow();
         },
-        onRun: function() {
+        onRun: function(yargsInstance) {
           onRunChildHasRun = true;
+          // Not expecting this function to get invoked
         },
       });
       tyRunInstance.taskYargs.register('father', {
         description: 'A father task with an onInit function',
         prerequisiteTasks: ['child'],
-        checks: [],
-        options: [],
-        onInit: function() {
+        checks: [helper.checkMustHaveFooUnlessHelp],
+        options: [helper.optionFoo],
+        onInit: function(yargsInstance) {
           onInitFatherHasRun = true;
+          expect(function() {
+            var cliArgs = yargsInstance.argv;
+            expect(cliArgs.foo).toEqual('bar');
+          }).not.toThrow();
         },
-        onRun: function() {
+        onRun: function(yargsInstance) {
           onRunFatherHasRun = true;
+          expect(function() {
+            var cliArgs = yargsInstance.argv;
+            expect(cliArgs.foo).toEqual('bar');
+          }).not.toThrow();
         },
       });
       onInitChildHasRun = false;
       onInitFatherHasRun = false;
       onRunChildHasRun = false;
       onRunFatherHasRun = false;
-      tyRunInstance.byName('father');
+      tyRunInstance.byName('father', undefined,
+        ['node', 'my-process', 'father', '--foo', 'bar', '--jojo', 'momo']);
       expect(onInitFatherHasRun).toEqual(true);
       expect(onInitChildHasRun).toEqual(true);
       expect(onRunFatherHasRun).toEqual(true);
