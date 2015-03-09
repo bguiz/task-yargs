@@ -29,6 +29,6 @@
     "jasmine-node": "^1.14.5"
   },
   "dependencies": {
-    "yargs": "^2"
+    "yargs": "^3.4.5"
   }
 }
