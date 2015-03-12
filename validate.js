@@ -34,6 +34,9 @@ function validateRegisterTask(name, task) {
   if (!isArray(task.prerequisiteTasks)) {
     throw new Error('Task must specify prerequisite tasks list');
   }
+  if (typeof task.hidden !== 'undefined' && typeof task.hidden !== 'boolean') {
+    throw new Error('If task specifies hidden, it must be Boolean');
+  }
   else {
     task.prerequisiteTasks.forEach(function(prerequisiteTask, index) {
       if (!isString(prerequisiteTask)) {

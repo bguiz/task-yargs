@@ -142,12 +142,29 @@ function taskYargs() {
     }
   }
 
+  function getTaskNames(showHidden) {
+    var names = [];
+    for (var taskName in tasks) {
+      if (tasks.hasOwnProperty(taskName)) {
+        names.push(taskName);
+      }
+    }
+    if (!showHidden) {
+      names = names.filter(function(name) {
+        var task = tasks[name];
+        return !task.hidden;
+      });
+    }
+    return names;
+  }
+
   return {
     register: registerTask,
     get: getTaskByName,
     getDefinition: getTaskObjectByName,
     getCurrent: getCurrentTask,
     getCurrentName: getCurrentTaskName,
+    getNames: getTaskNames,
   };
 }
 

@@ -150,7 +150,6 @@ describe('[register without prerequisites]', function() {
           options: [],
         });
       }).toThrow('Task must specify a description');
-      done();
       expect(function() {
         tyInstance.register('noPrerequisites', {
           description: 'A task without prerequisites',
@@ -159,7 +158,15 @@ describe('[register without prerequisites]', function() {
           options: [],
         });
       }).toThrow('Task must specify prerequisite tasks list');
-      done();
+      expect(function() {
+        tyInstance.register('hiddenWrongType', {
+          description: 'A task the a wrong type for hidden',
+          prerequisiteTasks: [],
+          checks: [],
+          options: [],
+          hidden: 'string',
+        });
+      }).toThrow('If task specifies hidden, it must be Boolean');
       expect(function() {
         tyInstance.register('malformedPrerequisites', {
           description: 'A task with malformed prerequisites',
@@ -168,7 +175,6 @@ describe('[register without prerequisites]', function() {
           options: [],
         });
       }).toThrow('Prerequisite task #1 is not a string');
-      done();
       expect(function() {
         tyInstance.register('noChecks', {
           description: 'A task without checks',
@@ -177,7 +183,6 @@ describe('[register without prerequisites]', function() {
           options: [],
         });
       }).toThrow('Task must specify checks list');
-      done();
       expect(function() {
         tyInstance.register('malformedChecks', {
           description: 'A task with malformed checks',
@@ -186,7 +191,6 @@ describe('[register without prerequisites]', function() {
           options: [],
         });
       }).toThrow('Check #1 is badly formed');
-      done();
       expect(function() {
         tyInstance.register('noOptions', {
           description: 'A task attempting to overwrite an existing task',
@@ -195,7 +199,6 @@ describe('[register without prerequisites]', function() {
           options: undefined,
         });
       }).toThrow('Task must specify options list');
-      done();
       expect(function() {
         tyInstance.register('malformedOptions', {
           description: 'A task attempting to overwrite an existing task',
@@ -266,6 +269,65 @@ describe('[register without prerequisites]', function() {
         yargsInstance.argv;
       }).not.toThrow();
 
+      done();
+    });
+  });
+
+  describe('[list]', function() {
+    it('Should register a hidden task', function(done) {
+      var tyInstance = taskYargs();
+      tyInstance.register('hidden', {
+        description: 'A hidden task',
+        prerequisiteTasks: [],
+        checks: [],
+        options: [],
+        hidden: true,
+      });
+      var taskNames = tyInstance.getNames();
+      expect(taskNames).toEqual([]);
+      taskNames = tyInstance.getNames(true);
+      expect(taskNames).toEqual(['hidden']);
+      done();
+    });
+
+    it('Should register a mixture of hidden and non hidden tasks', function(done) {
+      var tyInstance = taskYargs();
+      tyInstance.register({
+        name: 'hidden',
+        description: 'A hidden task',
+        prerequisiteTasks: [],
+        checks: [],
+        options: [],
+        hidden: true,
+      });
+      tyInstance.register({
+        name: 'visible',
+        description: 'A visible task',
+        prerequisiteTasks: [],
+        checks: [],
+        options: [],
+        hidden: false,
+      });
+      tyInstance.register({
+        name: 'hidden2',
+        description: 'Another hidden task',
+        prerequisiteTasks: [],
+        checks: [],
+        options: [],
+        hidden: true,
+      });
+      tyInstance.register({
+        name: 'visible2',
+        description: 'Another visible task',
+        prerequisiteTasks: [],
+        checks: [],
+        options: [],
+        hidden: false,
+      });
+      var taskNames = tyInstance.getNames();
+      expect(taskNames).toEqual(['visible', 'visible2']);
+      taskNames = tyInstance.getNames(true);
+      expect(taskNames).toEqual(['hidden', 'visible', 'hidden2', 'visible2']);
       done();
     });
   });
