@@ -1,9 +1,13 @@
 'use strict';
 
-var taskYargs = require('./index');
+var taskYargsFluent = require('./fluent');
 
-function taskYargsRun() {
-  var tyInstance = taskYargs();
+function taskYargsRun(tyInstance) {
+  if (!tyInstance) {
+    var taskYargs = require('./index');
+    tyInstance = taskYargs();
+  }
+  var tyFluentInstance = taskYargsFluent(tyInstance);
 
   function initialise(taskName, yargsInstance) {
     // Call onInit of all prerequisite tasks which them
@@ -57,6 +61,7 @@ function taskYargsRun() {
 
   return {
     taskYargs: tyInstance,
+    fluent: tyFluentInstance,
     byName: runByName,
     current: runCurrent,
   };
