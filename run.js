@@ -44,7 +44,8 @@ function taskYargsRun(tyInstance) {
   }
 
   function runCurrent(onRun, processArgv) {
-    processArgv = processArgv || process.argv;
+    processArgv = processArgv ||
+      /* istanbul ignore next: cannot test in jasmine */ process.argv;
     var cliArgs;
     var taskName = tyInstance.getCurrentName(processArgv);
     if (taskName) {

@@ -57,7 +57,7 @@ function taskYargsFluent(tyInstance) {
       // Terminates fluent interface - does not return the fluent interface,
       // but rather the object it was building instead
       return fluent.definition;
-    }
+    };
     return fluent;
   }
 
@@ -69,6 +69,6 @@ function taskYargsFluent(tyInstance) {
     taskYargs: tyInstance,
     create: createFluentTask,
   };
-};
+}
 
 module.exports = taskYargsFluent;

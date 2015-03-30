@@ -1,10 +1,13 @@
 {
   "name": "task-yargs",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "Create sub-task oriented command line interfaces with yargs easily",
   "main": "index.js",
   "scripts": {
-    "test": "node ./node_modules/jasmine-node/bin/jasmine-node test"
+    "test": "node ./node_modules/jasmine-node/bin/jasmine-node test",
+    "lint": "./node_modules/jshint/bin/jshint --verbose --reporter ./node_modules/jshint-stylish .",
+    "cover": "node ./node_modules/istanbul/lib/cli cover ./node_modules/jasmine-node/bin/jasmine-node test",
+    "coveralls": "npm run cover && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js"
   },
   "repository": {
     "type": "git",
@@ -26,9 +29,13 @@
   },
   "homepage": "https://github.com/bguiz/task-yargs",
   "devDependencies": {
-    "jasmine-node": "^1.14.5"
+    "coveralls": "^2.11.2",
+    "istanbul": "^0.3.11",
+    "jasmine-node": "^2.0.0",
+    "jshint": "^2.6.3",
+    "jshint-stylish": "^1.0.1"
   },
   "dependencies": {
-    "yargs": "^3.4.5"
+    "yargs": "^3.5.4"
   }
 }

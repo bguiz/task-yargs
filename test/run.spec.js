@@ -4,7 +4,17 @@ var helper = require('./helper');
 var taskYargsRun = require('../run');
 
 describe('[run]', function() {
-  describe('[simple]', function() {
+  describe('[instance specified]', function() {
+    it('Should be able to instantiate a task yargs run instance with a specified task yargs instance', function(done) {
+      var tyInstance = require('../index')();
+      expect(function() {
+        var tyRunInstance = taskYargsRun(tyInstance);
+      }).not.toThrow();
+      done();
+    });
+  });
+
+  describe('[with onRun]', function() {
     describe('[object]', function() {
       var onRunHasRun;
       var tyRunInstance = taskYargsRun();
@@ -18,6 +28,13 @@ describe('[run]', function() {
         },
       });
 
+      tyRunInstance.taskYargs.register('norun', {
+        description: 'A blank task without an onRun function',
+        prerequisiteTasks: [],
+        checks: [],
+        options: [],
+      });
+
       it('Should run a task\'s onRun function (named)', function(done) {
         onRunHasRun = false;
         tyRunInstance.byName('blank');
@@ -29,6 +46,69 @@ describe('[run]', function() {
         onRunHasRun = false;
         tyRunInstance.current(undefined, ['node', 'my-process', 'blank']);
         expect(onRunHasRun).toEqual(true);
+        done();
+      });
+
+      it('Should fail to run a task that does not define an onRun function (current)', function(done) {
+        onRunHasRun = false;
+        expect(function() {
+          tyRunInstance.current(undefined, ['node', 'my-process', 'norun']);
+        }).toThrowError('Task definition for "norun" does not define an onRun function, and no default was provided');
+        expect(onRunHasRun).toEqual(false);
+        done();
+      });
+
+      it('Should fail to run a task that does not define an onRun function (by name)', function(done) {
+        onRunHasRun = false;
+        expect(function() {
+          tyRunInstance.byName('norun', undefined, ['node', 'my-process', 'norun']);
+        }).toThrowError('Task definition for "norun" does not define an onRun function, and no default was provided');
+        expect(onRunHasRun).toEqual(false);
+        done();
+      });
+
+      it('Should show help for a task that does not define an onRun function (current)', function(done) {
+        onRunHasRun = false;
+        expect(function() {
+          tyRunInstance.current(undefined, ['node', 'my-process', 'norun', '--help']);
+        }).not.toThrow();
+        expect(onRunHasRun).toEqual(false);
+        done();
+      });
+
+      it('Should fail to run a task that is not defined (current)', function(done) {
+        onRunHasRun = false;
+        expect(function() {
+          tyRunInstance.current(undefined, ['node', 'my-process', 'foobar']);
+        }).not.toThrow();
+        expect(onRunHasRun).toEqual(false);
+        done();
+      });
+
+      it('Should fail to run a task that is not defined (by name)', function(done) {
+        onRunHasRun = false;
+        expect(function() {
+          tyRunInstance.current('foobar', undefined, ['node', 'my-process', 'foobar']);
+        }).not.toThrow();
+        expect(onRunHasRun).toEqual(false);
+        done();
+      });
+
+      it('Should fail to run a task when no name specified (current)', function(done) {
+        onRunHasRun = false;
+        expect(function() {
+          tyRunInstance.current(undefined, ['node', 'my-process']);
+        }).not.toThrow();
+        expect(onRunHasRun).toEqual(false);
+        done();
+      });
+
+      it('Should fail to run a task when no name specified (byName)', function(done) {
+        onRunHasRun = false;
+        expect(function() {
+          tyRunInstance.byName('foobar', undefined, ['node', 'my-process']);
+        }).toThrowError('No task registered with name foobar');
+        expect(onRunHasRun).toEqual(false);
         done();
       });
     });
@@ -54,6 +134,34 @@ describe('[run]', function() {
       it('Should run a tasks\'s onRun function (current)', function(done) {
         onRunHasRun = false;
         tyRunInstance.current(undefined, ['node', 'my-process', 'blank']);
+        expect(onRunHasRun).toEqual(true);
+        done();
+      });
+    });
+
+    describe('[custom onRun]', function() {
+      var onRunHasRun;
+      function customOnRun() {
+        onRunHasRun = true;
+      };
+      var tyRunInstance = taskYargsRun();
+      tyRunInstance.taskYargs.register('blank', {
+        description: 'A blank task with an onRun function',
+        prerequisiteTasks: [],
+        checks: [],
+        options: [],
+      });
+
+      it('Should run a task (by name) with a custom onRun function', function(done) {
+        onRunHasRun = false;
+        tyRunInstance.byName('blank', customOnRun, ['node', 'my-process', 'blank']);
+        expect(onRunHasRun).toEqual(true);
+        done();
+      });
+
+      it('Should run a task (current) with a custom onRun function', function(done) {
+        onRunHasRun = false;
+        tyRunInstance.current(customOnRun, ['node', 'my-process', 'blank']);
         expect(onRunHasRun).toEqual(true);
         done();
       });
