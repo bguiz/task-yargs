@@ -1,10 +1,11 @@
 # `task-yargs`
 
-Create sub-task oriented common line interfaces with yargs easily.
+Create sub-task oriented command line interfaces with yargs easily.
 
 [![NPM](https://nodei.co/npm/task-yargs.png)](https://github.com/bguiz/task-yargs/)
 
 [![Build Status](https://travis-ci.org/bguiz/task-yargs.svg?branch=master)](https://travis-ci.org/bguiz/task-yargs)
+[![Coverage Status](https://coveralls.io/repos/bguiz/task-yargs/badge.svg?branch=master)](https://coveralls.io/r/bguiz/task-yargs?branch=master)
 
 ## What is "sub-task oriented"?
 
@@ -160,7 +161,7 @@ taskYargs.register('foo', {
 
 Maintained by Brendan Graetz
 
-[bguiz.com/](http://bguiz.com/)
+[bguiz.com](http://bguiz.com/)
 
 ## Licence
 

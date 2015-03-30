@@ -8,7 +8,7 @@ describe('[fluent]', function() {
     var tyFluentInstance = taskYargsFluent();
 
     it('Should construct a valid object', function(done) {
-      var definition;
+      var definition, definition2;
       expect(function() {
         definition = tyFluentInstance
           .create('name')
@@ -32,6 +32,25 @@ describe('[fluent]', function() {
         options: ['woo', 'woo', 'woo'],
         checks: ['hoo', 'hoo', 'hoo'],
         hidden: true,
+        onInit: undefined,
+        onRun: undefined,
+      });
+
+      expect(function() {
+        definition2 = tyFluentInstance
+          .create('name2')
+          .describe('description2')
+          .hidden(false)
+          .definition;
+      }).not.toThrow();
+
+      expect(definition2).toEqual({
+        name: 'name2',
+        description: 'description2',
+        prerequisiteTasks: [],
+        options: [],
+        checks: [],
+        hidden: false,
         onInit: undefined,
         onRun: undefined,
       });

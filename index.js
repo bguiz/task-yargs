@@ -51,15 +51,10 @@ function taskYargs() {
 
     function addPrereqTasksToList(taskName) {
       var task = tasks[taskName];
-      if (!task) {
-        throw new Error('No task registered with name ' + taskName);
-      }
-      if (validate.isArray(task.prerequisiteTasks)) {
-        task.prerequisiteTasks.forEach(function(prereqTaskName) {
-          list.push(prereqTaskName);
-          addPrereqTasksToList(prereqTaskName); //recursion
-        });
-      }
+      task.prerequisiteTasks.forEach(function(prereqTaskName) {
+        list.push(prereqTaskName);
+        addPrereqTasksToList(prereqTaskName); //recursion
+      });
     }
 
     addPrereqTasksToList(mainTaskName);
@@ -124,7 +119,8 @@ function taskYargs() {
   }
 
   function getCurrentTaskName(processArgv) {
-    processArgv = processArgv || process.argv;
+    processArgv = processArgv ||
+      /* istanbul ignore next : cannot be tested from jasmine */ process.argv;
     var argv = yargs(processArgv).argv;
     if (argv && validate.isArray(argv._) && argv._.length > 2) {
       var taskName = argv._[2];
@@ -135,7 +131,8 @@ function taskYargs() {
   }
 
   function getCurrentTask(processArgv) {
-    processArgv = processArgv || process.argv;
+    processArgv = processArgv ||
+      /* istanbul ignore next : cannot be tested from jasmine */ process.argv;
     var taskName = getCurrentTaskName(processArgv);
     if (taskName) {
       return getTaskByName(taskName, processArgv.slice(2));
@@ -145,6 +142,7 @@ function taskYargs() {
   function getTaskNames(showHidden) {
     var names = [];
     for (var taskName in tasks) {
+      /* istanbul ignore else : hasOwnProperty white-listed */
       if (tasks.hasOwnProperty(taskName)) {
         names.push(taskName);
       }
