@@ -157,6 +157,12 @@ taskYargs.register('foo', {
 });
 ```
 
+## Contributing
+
+This repository uses the **git flow** branching strategy.
+If you wish to contribute, please branch from the **develop** branch -
+pull requests will only be requested if they request merging into the develop branch.
+
 ## Author
 
 Maintained by Brendan Graetz
